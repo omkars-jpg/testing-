@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Admin — Food by Soni{% endblock %}
+{% block content %}
+<div class="wrap">
+  <h2 class="sec">Admin dashboard</h2>
+  <div class="stats">
+    <div class="stat"><b>{{ stats.orders }}</b><span>Orders</span></div>
+    <div class="stat"><b>₹{{ '%.0f'|format(stats.revenue) }}</b><span>Revenue</span></div>
+    <div class="stat"><b>{{ stats.users }}</b><span>Customers</span></div>
+    <div class="stat"><b>{{ stats.restaurants }}</b><span>Restaurants</span></div>
+  </div>
+
+  <h3 class="sec">Recent orders</h3>
+  <div class="table-wrap"><table>
+    <tr><th>Order</th><th>Customer</th><th>Restaurant</th><th>Total</th><th>Status</th><th>Update</th></tr>
+    {% for o in orders %}
+    <tr>
+      <td><a href="{{ url_for('track', oid=o.id) }}">{{ o.code }}</a><small class="block-s muted">{{ o.created_at }}</small></td>
+      <td>{{ o.uname }}<small class="block-s muted">{{ o.phone }}</small></td>
+      <td>{{ o.rname }}</td><td>₹{{ o.total }}</td>
+      <td><span class="status s-{{ o.status|replace(' ', '') }}">{{ o.status }}</span></td>
+      <td><form method="post" action="{{ url_for('admin_order', oid=o.id) }}" class="inline">
+        <select name="status">{% for s in statuses %}<option {{ 'selected' if s == o.status }}>{{ s }}</option>{% endfor %}<option value="Auto">Auto (time based)</option></select>
+        <button class="btn btn-dark sm">Save</button></form></td>
+    </tr>
+    {% else %}<tr><td colspan="6" class="muted">No orders yet.</td></tr>{% endfor %}
+  </table></div>
+
+  <h3 class="sec">Restaurants</h3>
+  <div class="table-wrap"><table>
+    <tr><th>Name</th><th>Cuisines</th><th>Rating</th><th>Status</th><th></th></tr>
+    {% for r in restaurants %}
+    <tr><td>{{ r.emoji }} {{ r.name }}</td><td>{{ r.cuisines }}</td><td>{{ r.rating }}</td>
+      <td>{{ 'Open' if r.is_open else 'Closed' }}</td>
+      <td><form method="post" action="{{ url_for('admin_toggle', rid=r.id) }}"><button class="btn btn-ghost sm">{{ 'Close' if r.is_open else 'Open' }}</button></form></td></tr>
+    {% endfor %}
+  </table></div>
+
+  <h3 class="sec">Add menu item</h3>
+  <form method="post" action="{{ url_for('admin_menu') }}" class="panel admin-form">
+    <label class="field">Restaurant<select name="restaurant_id">{% for r in restaurants %}<option value="{{ r.id }}">{{ r.name }}</option>{% endfor %}</select></label>
+    <label class="field">Category<input name="category" placeholder="e.g. Starters"></label>
+    <label class="field">Item name<input name="name" required></label>
+    <label class="field">Price (₹)<input name="price" type="number" min="1" required></label>
+    <label class="field">Description<input name="description"></label>
+    <label class="field">Emoji<input name="emoji" maxlength="4" placeholder="🍽️"></label>
+    <label class="radio"><input type="checkbox" name="is_veg" checked> Vegetarian</label>
+    <button class="btn btn-primary">Add item</button>
+  </form>
+</div>
+{% endblock %}

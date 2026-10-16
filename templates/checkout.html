@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Checkout — Food by Soni{% endblock %}
+{% block page %}checkout{% endblock %}
+{% block content %}
+<div class="wrap narrow-wrap">
+  <h2 class="sec">Checkout</h2>
+  <form method="post" class="cart-layout">
+    <div>
+      <div class="panel">
+        <div class="panel-title">Delivery address</div>
+        <label class="field">Full address
+          <textarea name="address" rows="3" required placeholder="House / flat no., street, landmark, area">{{ request.form.get('address', '') }}</textarea>
+        </label>
+        <label class="field">Phone number
+          <input name="phone" inputmode="numeric" maxlength="10" required placeholder="10-digit mobile number" value="{{ request.form.get('phone', current_user.phone or '') }}">
+        </label>
+        <label class="field">Cooking instructions (optional)
+          <input name="note" placeholder="e.g. less spicy, no onion" value="{{ request.form.get('note', '') }}">
+        </label>
+      </div>
+      <div class="panel">
+        <div class="panel-title">Payment</div>
+        {% for k, label in payments.items() %}
+        <label class="radio"><input type="radio" name="payment" value="{{ k }}" {{ 'checked' if loop.first }}> {{ label }}</label>
+        {% endfor %}
+        <p class="hint">Demo app: no real payment is taken.</p>
+      </div>
+    </div>
+    <aside class="panel bill">
+      <div class="panel-title">{{ det.restaurant.name }}</div>
+      {% for l in det.lines %}<div class="bill-row"><span>{{ l.qty }} × {{ l.item.name }}</span><span>₹{{ l.line }}</span></div>{% endfor %}
+      <hr>
+      <div class="bill-row"><span>Item total</span><span>₹{{ det.subtotal }}</span></div>
+      <div class="bill-row"><span>Delivery fee</span><span>{{ '₹' ~ det.delivery if det.delivery else 'FREE' }}</span></div>
+      <div class="bill-row"><span>Platform fee</span><span>₹{{ det.platform }}</span></div>
+      <div class="bill-row"><span>GST (5%)</span><span>₹{{ det.tax }}</span></div>
+      {% if det.discount %}<div class="bill-row save"><span>Discount ({{ det.coupon }})</span><span>−₹{{ det.discount }}</span></div>{% endif %}
+      <div class="bill-row total"><span>To pay</span><span>₹{{ det.total }}</span></div>
+      <button class="btn btn-primary block">Place order</button>
+    </aside>
+  </form>
+</div>
+{% endblock %}

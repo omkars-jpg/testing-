@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Your cart — Food by Soni{% endblock %}
+{% block page %}cart{% endblock %}
+{% block content %}
+{% from "_macros.html" import ctl %}
+<div class="wrap narrow-wrap">
+  <h2 class="sec">Your cart</h2>
+  {% if not det.lines %}
+  <div class="empty"><h3>Your cart is empty</h3><p>Good food is always cooking. Pick a restaurant to start.</p><a class="btn btn-primary" href="{{ url_for('index') }}">Browse restaurants</a></div>
+  {% else %}
+  <div class="cart-layout">
+    <div>
+      <div class="panel">
+        <div class="panel-title">From <a href="{{ url_for('restaurant', rid=det.restaurant.id) }}">{{ det.restaurant.name }}</a></div>
+        {% for l in det.lines %}
+        <div class="cart-line">
+          <span class="veg-dot {{ 'veg' if l.item.is_veg else 'nonveg' }}"></span>
+          <div class="cl-name">{{ l.item.name }}<small>₹{{ l.item.price }} each</small></div>
+          <div class="ctl">{{ ctl(l.item.id, l.qty) }}</div>
+          <div class="cl-price">₹{{ l.line }}</div>
+        </div>
+        {% endfor %}
+        <form method="post" action="{{ url_for('cart_clear') }}"><button class="link-btn">Clear cart</button></form>
+      </div>
+      <div class="panel">
+        <div class="panel-title">Coupons</div>
+        {% if det.coupon %}
+          <form method="post" action="{{ url_for('cart_coupon') }}" class="coupon-applied">✅ <b>{{ det.coupon }}</b> applied — you save ₹{{ det.discount }}<input type="hidden" name="remove" value="1"><button class="link-btn">Remove</button></form>
+        {% else %}
+          <form method="post" action="{{ url_for('cart_coupon') }}" class="coupon-form"><input name="code" placeholder="Enter coupon code" id="couponInput"><button class="btn btn-dark sm">Apply</button></form>
+          <div class="coupon-list">
+            {% for code, c in coupons.items() %}<button type="button" class="coupon-chip" data-code="{{ code }}"><b>{{ code }}</b><small>{{ c.desc }}</small></button>{% endfor %}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+    <aside class="panel bill">
+      <div class="panel-title">Bill details</div>
+      <div class="bill-row"><span>Item total</span><span>₹{{ det.subtotal }}</span></div>
+      <div class="bill-row"><span>Delivery fee</span><span>{{ '₹' ~ det.delivery if det.delivery else 'FREE' }}</span></div>
+      <div class="bill-row"><span>Platform fee</span><span>₹{{ det.platform }}</span></div>
+      <div class="bill-row"><span>GST (5%)</span><span>₹{{ det.tax }}</span></div>
+      {% if det.discount %}<div class="bill-row save"><span>Coupon discount</span><span>−₹{{ det.discount }}</span></div>{% endif %}
+      <div class="bill-row total"><span>To pay</span><span>₹{{ det.total }}</span></div>
+      {% if det.subtotal < 399 %}<p class="hint">Add ₹{{ 399 - det.subtotal }} more for free delivery.</p>{% endif %}
+      <a class="btn btn-primary block" href="{{ url_for('checkout') }}">Proceed to checkout</a>
+    </aside>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

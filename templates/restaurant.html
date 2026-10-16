@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}{{ r.name }} — Food by Soni{% endblock %}
+{% block page %}restaurant{% endblock %}
+{% block content %}
+{% from "_macros.html" import ctl %}
+{% set c = r.color.split(',') %}
+<section class="rest-head" style="background:linear-gradient(135deg,{{ c[0] }},{{ c[1] }})">
+  <div class="wrap rest-head-in">
+    <div class="rest-emoji">{{ r.emoji }}</div>
+    <div>
+      <h1>{{ r.name }}</h1>
+      <p>{{ r.cuisines }} · {{ r.address }}</p>
+      <div class="rest-badges">
+        <span class="rating">★ {{ r.rating }}</span>
+        <span>{{ r.delivery_time }} mins</span>
+        <span>₹{{ r.cost_for_two }} for two</span>
+        {% if not r.is_open %}<span class="tag-closed">Closed now</span>{% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+<div class="wrap">
+  {% if r.offer %}<div class="offer-strip">Offer: <b>{{ r.offer }}</b> · Apply coupons at checkout</div>{% endif %}
+  <div class="menu-tools"><label class="toggle"><input type="checkbox" id="vegonly"> Veg only</label></div>
+  {% for cat, its in menu.items() %}
+  <section class="menu-cat">
+    <h3>{{ cat }} <small>{{ its|length }}</small></h3>
+    {% for it in its %}
+    <div class="dish" data-veg="{{ it.is_veg }}">
+      <div class="dish-info">
+        <span class="veg-dot {{ 'veg' if it.is_veg else 'nonveg' }}" title="{{ 'Veg' if it.is_veg else 'Non-veg' }}"></span>
+        {% if it.bestseller %}<span class="best">★ Bestseller</span>{% endif %}
+        <h4>{{ it.name }}</h4>
+        <div class="price">₹{{ it.price }}</div>
+        <p>{{ it.description }}</p>
+      </div>
+      <div class="dish-art">
+        <div class="emoji-box">{{ it.emoji }}</div>
+        <div class="ctl" data-id="{{ it.id }}">{{ ctl(it.id, cart.get(it.id|string, 0)) }}</div>
+      </div>
+    </div>
+    {% endfor %}
+  </section>
+  {% endfor %}
+</div>
+<a class="cartbar {{ 'show' if cart_count }}" id="cartbar" href="{{ url_for('cart_page') }}">
+  <span><b id="barcount">{{ cart_count }}</b> item(s) · ₹<b id="barsub">{{ subtotal }}</b></span>
+  <span>View cart</span>
+</a>
+{% endblock %}

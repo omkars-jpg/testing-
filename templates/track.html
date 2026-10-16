@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Track {{ o.code }} — Food by Soni{% endblock %}
+{% block page %}track{% endblock %}
+{% block content %}
+<div class="wrap narrow-wrap">
+  <h2 class="sec">Order {{ o.code }}</h2>
+  <div class="panel" id="trackPanel" data-oid="{{ o.id }}" data-stage="{{ o.stage }}" data-status="{{ o.status }}">
+    <div class="row">
+      <div><b>{{ r.emoji }} {{ r.name }}</b><small class="muted block-s">Placed {{ o.created_at }}</small></div>
+      <span class="status s-{{ o.status|replace(' ', '') }}" id="statusBadge">{{ o.status }}</span>
+    </div>
+    {% if o.status == 'Cancelled' %}
+      <div class="flash error">This order was cancelled.</div>
+    {% else %}
+    <div class="track" id="track">
+      {% for s in stages %}
+      <div class="step {{ 'done' if loop.index0 < o.stage or (loop.index0 == o.stage and o.stage == 3) else ('active' if loop.index0 == o.stage else '') }}">
+        <div class="dot">{{ loop.index }}</div><span>{{ s }}</span>
+      </div>
+      {% endfor %}
+    </div>
+    <p class="eta" id="eta">
+      {% if o.status == 'Delivered' %}Delivered. Enjoy your meal!{% else %}Estimated delivery in about {{ r.delivery_time }} mins{% endif %}
+    </p>
+    {% endif %}
+    {% if o.stage >= 2 and o.status != 'Delivered' %}<div class="partner">Your delivery partner <b>{{ o.partner }}</b> is on the way.</div>{% endif %}
+  </div>
+  <div class="cart-layout">
+    <div class="panel">
+      <div class="panel-title">Items</div>
+      {% for i in items %}<div class="bill-row"><span>{{ i.qty }} × {{ i.name }}</span><span>₹{{ i.price * i.qty }}</span></div>{% endfor %}
+      <hr>
+      <div class="panel-title">Delivering to</div>
+      <p>{{ o.address }}</p><p class="muted">Phone: {{ o.phone }}{% if o.note %} · Note: {{ o.note }}{% endif %}</p>
+    </div>
+    <aside class="panel bill">
+      <div class="panel-title">Payment summary</div>
+      <div class="bill-row"><span>Item total</span><span>₹{{ o.subtotal }}</span></div>
+      <div class="bill-row"><span>Delivery fee</span><span>₹{{ o.delivery_fee }}</span></div>
+      <div class="bill-row"><span>Platform fee</span><span>₹{{ o.platform_fee }}</span></div>
+      <div class="bill-row"><span>GST</span><span>₹{{ o.tax }}</span></div>
+      {% if o.discount %}<div class="bill-row save"><span>Discount {{ '(' ~ o.coupon ~ ')' if o.coupon }}</span><span>−₹{{ o.discount }}</span></div>{% endif %}
+      <div class="bill-row total"><span>Total</span><span>₹{{ o.total }}</span></div>
+      <p class="hint">{{ o.payment }}</p>
+    </aside>
+  </div>
+</div>
+{% endblock %}

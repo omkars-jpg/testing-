@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Log in — Food by Soni{% endblock %}
+{% block content %}
+<div class="auth">
+  <h2>Log in</h2>
+  <form method="post">
+    <label class="field">Email<input type="email" name="email" required autofocus></label>
+    <label class="field">Password<input type="password" name="password" required></label>
+    <button class="btn btn-primary block">Log in</button>
+  </form>
+  <p class="muted">New here? <a href="{{ url_for('signup') }}">Create an account</a></p>
+  <p class="hint">Admin demo: admin@foodbysoni.com / admin123</p>
+</div>
+{% endblock %}

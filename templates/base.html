@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}Food by Soni — Order food online{% endblock %}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body data-page="{% block page %}{% endblock %}">
+<header class="nav">
+  <div class="nav-in">
+    <a class="logo" href="{{ url_for('index') }}"><span class="logo-mark">S</span><span>Food <i>by</i> Soni</span></a>
+    <form class="nav-search" action="{{ url_for('index') }}">
+      <input name="q" placeholder="Search restaurants or dishes" value="{{ request.args.get('q', '') }}">
+    </form>
+    <nav class="nav-links">
+      {% if current_user %}
+        {% if current_user.is_admin %}<a href="{{ url_for('admin') }}">Admin</a>{% endif %}
+        <a href="{{ url_for('orders') }}">My orders</a>
+        <a href="{{ url_for('logout') }}">Log out ({{ current_user.name.split()[0] }})</a>
+      {% else %}
+        <a href="{{ url_for('login') }}">Log in</a>
+        <a class="btn btn-primary sm" href="{{ url_for('signup') }}">Sign up</a>
+      {% endif %}
+      <a class="cart-link" href="{{ url_for('cart_page') }}">Cart <span class="badge" id="navcount">{{ cart_count }}</span></a>
+    </nav>
+  </div>
+</header>
+<main>
+  {% with msgs = get_flashed_messages(with_categories=true) %}
+    {% if msgs %}<div class="wrap">{% for c, m in msgs %}<div class="flash {{ c }}">{{ m }}</div>{% endfor %}</div>{% endif %}
+  {% endwith %}
+  {% block content %}{% endblock %}
+</main>
+<footer>
+  <div class="wrap foot">
+    <div><b>Food by Soni</b><p>Hot food from your favourite kitchens, at your door.</p></div>
+    <div><p>Coupons: WELCOME50 · SONI20 · FREEDEL</p><p>Demo project — payments are not processed.</p></div>
+  </div>
+</footer>
+<div id="toast"></div>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

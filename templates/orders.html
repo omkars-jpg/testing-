@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}My orders — Food by Soni{% endblock %}
+{% block content %}
+<div class="wrap narrow-wrap">
+  <h2 class="sec">My orders</h2>
+  {% if not orders %}
+  <div class="empty"><h3>No orders yet</h3><p>Your orders will show up here.</p><a class="btn btn-primary" href="{{ url_for('index') }}">Order now</a></div>
+  {% endif %}
+  {% for o in orders %}
+  <div class="panel order-card">
+    <div class="row">
+      <div><b>{{ o.remoji }} {{ o.rname }}</b><small class="muted block-s">{{ o.code }} · {{ o.created_at }}</small></div>
+      <span class="status s-{{ o.status|replace(' ', '') }}">{{ o.status }}</span>
+    </div>
+    <p class="muted">{{ o.summary }}</p>
+    <div class="row">
+      <b>₹{{ o.total }}</b>
+      <div class="actions">
+        <a class="btn btn-ghost sm" href="{{ url_for('track', oid=o.id) }}">{{ 'View' if o.status in ['Delivered', 'Cancelled'] else 'Track' }}</a>
+        <form method="post" action="{{ url_for('reorder', oid=o.id) }}"><button class="btn btn-dark sm">Reorder</button></form>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

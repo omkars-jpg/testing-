@@ -1,0 +1,7 @@
+{% macro ctl(id, qty) %}
+{% if qty %}
+<div class="stepper"><button class="minus" data-id="{{ id }}" aria-label="Remove one">−</button><span class="q">{{ qty }}</span><button class="plus" data-id="{{ id }}" aria-label="Add one">+</button></div>
+{% else %}
+<button class="add-btn" data-id="{{ id }}">ADD</button>
+{% endif %}
+{% endmacro %}

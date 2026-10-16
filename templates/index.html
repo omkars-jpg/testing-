@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block page %}home{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="hero-in">
+    <h1>Hungry? Order in minutes.</h1>
+    <p>Biryani, pizza, dosa, chaat and more — from kitchens near you.</p>
+    <form action="{{ url_for('index') }}" class="hero-search">
+      <input name="q" value="{{ search }}" placeholder="Search for biryani, pizza, dosa…">
+      <button class="btn btn-dark">Find food</button>
+    </form>
+    <div class="hero-offers">Use <b>WELCOME50</b> for 50% off your first order · <b>FREEDEL</b> above ₹249</div>
+  </div>
+</section>
+
+<section class="wrap">
+  <h2 class="sec">What's on your mind?</h2>
+  <div class="chips">
+    <a class="chip {{ 'on' if not cuisine }}" href="{{ url_for('index') }}"><span>🍽️</span>All</a>
+    {% for name, em in cuisines %}
+      <a class="chip {{ 'on' if cuisine == name }}" href="{{ url_for('index', cuisine=name) }}"><span>{{ em }}</span>{{ name }}</a>
+    {% endfor %}
+  </div>
+
+  <form class="filters" method="get">
+    <input type="hidden" name="q" value="{{ search }}">
+    <input type="hidden" name="cuisine" value="{{ cuisine }}">
+    <label class="toggle"><input type="checkbox" name="veg" value="1" {{ 'checked' if veg }} onchange="this.form.submit()"> Pure veg</label>
+    <label>Sort by
+      <select name="sort" onchange="this.form.submit()">
+        <option value="relevance" {{ 'selected' if sort == 'relevance' }}>Relevance</option>
+        <option value="rating" {{ 'selected' if sort == 'rating' }}>Rating</option>
+        <option value="time" {{ 'selected' if sort == 'time' }}>Delivery time</option>
+        <option value="cost" {{ 'selected' if sort == 'cost' }}>Cost: low to high</option>
+      </select>
+    </label>
+  </form>
+
+  <h2 class="sec">{{ restaurants|length }} restaurant{{ '' if restaurants|length == 1 else 's' }} delivering to you</h2>
+  {% if restaurants %}
+  <div class="grid">
+    {% for r in restaurants %}
+    {% set c = r.color.split(',') %}
+    <a class="rcard {{ '' if r.is_open else 'closed' }}" href="{{ url_for('restaurant', rid=r.id) }}">
+      <div class="rcard-top" style="background:linear-gradient(135deg,{{ c[0] }},{{ c[1] }})">
+        <span class="remoji">{{ r.emoji }}</span>
+        {% if r.offer %}<div class="ribbon">{{ r.offer }}</div>{% endif %}
+        {% if not r.is_open %}<div class="closed-tag">Closed now</div>{% endif %}
+      </div>
+      <div class="rcard-body">
+        <div class="row"><h3>{{ r.name }}</h3><span class="rating">★ {{ r.rating }}</span></div>
+        <p class="muted">{{ r.cuisines }}</p>
+        <div class="meta"><span>{{ r.delivery_time }} mins</span><span>₹{{ r.cost_for_two }} for two</span>{% if r.is_veg %}<span class="pure">Pure veg</span>{% endif %}</div>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty"><h3>No restaurants match that.</h3><p>Try a different dish or clear the filters.</p><a class="btn btn-primary" href="{{ url_for('index') }}">Clear filters</a></div>
+  {% endif %}
+</section>
+{% endblock %}

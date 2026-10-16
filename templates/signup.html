@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Sign up — Food by Soni{% endblock %}
+{% block content %}
+<div class="auth">
+  <h2>Create your account</h2>
+  <form method="post">
+    <label class="field">Full name<input name="name" required value="{{ request.form.get('name', '') }}"></label>
+    <label class="field">Email<input type="email" name="email" required value="{{ request.form.get('email', '') }}"></label>
+    <label class="field">Phone<input name="phone" inputmode="numeric" maxlength="10" value="{{ request.form.get('phone', '') }}"></label>
+    <label class="field">Password (6+ characters)<input type="password" name="password" required minlength="6"></label>
+    <button class="btn btn-primary block">Sign up</button>
+  </form>
+  <p class="muted">Already have an account? <a href="{{ url_for('login') }}">Log in</a></p>
+</div>
+{% endblock %}
